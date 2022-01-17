@@ -1,24 +1,41 @@
-import logo from './logo.svg';
+import { Box, styled } from '@mui/material';
 import './App.css';
+import Auth from './pages/Auth';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import FullscreenSpinner from './components/Common/FullscreenSpinner';
+import ProtectedRoute from './pages/ProtectedRoute';
+import Landing from './pages/Landing';
+import { useDispatch } from 'react-redux';
+import { loadUserRequest } from './redux/actions/authActions';
+import { useEffect } from 'react';
+
+const Container = styled(Box)({});
+
 
 function App() {
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(loadUserRequest());
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Container>
+        <FullscreenSpinner />
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/register" element={<Auth authRoute="register" />} />
+          <Route path="/login" element={<Auth authRoute="login" />} />
+
+          <Route path="/dashboard" element={<ProtectedRoute appRoute="dashboard" />} />
+
+
+        </Routes>
+
+      </Container>
+    </Router>
   );
 }
 
