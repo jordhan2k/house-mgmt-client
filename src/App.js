@@ -8,6 +8,7 @@ import Landing from './pages/Landing';
 import { useDispatch } from 'react-redux';
 import { loadUserRequest } from './redux/actions/authActions';
 import { useEffect } from 'react';
+import { getLastLoginRequest } from './redux/actions/notificationActions';
 
 const Container = styled(Box)({});
 
@@ -18,7 +19,8 @@ function App() {
 
   useEffect(() => {
     dispatch(loadUserRequest());
-  }, [])
+    dispatch(getLastLoginRequest());
+  }, [dispatch]);
 
   return (
     <Router>

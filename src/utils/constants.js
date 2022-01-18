@@ -5,7 +5,8 @@ export const colors = {
     primaryOrange: "#F5663C",
     primaryYellow: "#FFC307",
     primaryRed: "#E56F53",
-    primaryGreen: "#22DD4B"
+    primaryGreen: "#22DD4B",
+    secondaryDarkBlue: "#3A3B59"
 }
 
 export const authInputTypes = {

@@ -8,6 +8,7 @@ import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import { LogoutRounded } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { logoutRequest } from '../../redux/actions/authActions';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 
 
 const Container = styled(Box)(props => ({
@@ -65,6 +66,10 @@ const Sidebar = () => {
 
             <IconContainer>
                 <Icon src={calendar} />
+            </IconContainer>
+
+            <IconContainer>
+                <PeopleAltOutlinedIcon sx={{ fill: "white", fontSize: 40 }} />
             </IconContainer>
 
             <IconContainer style={{

@@ -13,7 +13,6 @@ function* loadUserHandler() {
         if (response.data.success) {
             console.log(response.data.user);
             yield put(loadUserSucceed(response.data.user));
-
         }
     } catch (error) {
         yield localStorage.removeItem(LOCAL_STORAGE_TOKEN_NAME);

@@ -8,7 +8,6 @@ const rootReducer = combineReducers({
     auth: authReducer,
     notification: notificationReducer,
     helper: helperReducer
-    
 });
 
 export default rootReducer;
