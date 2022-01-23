@@ -20,4 +20,8 @@ export const setAuthToken = token => {
     }
 }
 
+export const addHeaders = newHeaders => {
+    axiosClient.defaults.headers = { ...axiosClient.defaults.headers, ...newHeaders };
+}
+
 export default axiosClient;

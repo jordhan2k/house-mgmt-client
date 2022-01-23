@@ -1,12 +1,12 @@
 import axiosClient from "./axiosClient";
 
+
+
 class HouseApi {
 
-    createNewHouse(newHouse) {
-        return axiosClient.post()
+    getOne(houseId) {
+        return axiosClient.get(`houses/${houseId}`);
     }
-
-
 }
 
 const houseApi = new HouseApi();

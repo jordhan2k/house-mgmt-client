@@ -19,3 +19,20 @@ export const snackbarSeverity = {
     error: "error",
     warning: "warning"
 }
+
+export const panelModes = {
+    add: "panel/add",
+    edit: "panel/edit"
+}
+
+export const searchContext = {
+    dashboard: "search/dashboard",
+    users: "search/users",
+    guestPage: "search/guestPage"
+}
+
+export const commentModes = {
+    edit: "comments/mode/edit",
+    reply: "comments/mode/reply"
+}
+

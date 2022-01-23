@@ -2,23 +2,35 @@ import { all, put, takeEvery, takeLatest } from "redux-saga/effects";
 import { setAuthToken } from "../../api/axiosClient";
 import { authActionTypes, checkUsernameSucceed, loadUserFail, loadUserRequest, loadUserSucceed, logoutSuccess } from "../actions/authActions";
 import authApi from '../../api/authApi';
-import { LOCAL_STORAGE_TOKEN_NAME } from "../../utils/constants";
+import { LOCAL_STORAGE_TOKEN_NAME, snackbarSeverity } from "../../utils/constants";
+import { getHouseRequest, houseType } from "../actions/houseItemActions";
+import { getAllRequest, getLastLoginRequest } from "../actions/notificationActions";
+import { openSnackbar } from "../actions/helperActions";
 
 function* loadUserHandler() {
-    if (localStorage[LOCAL_STORAGE_TOKEN_NAME]) {
+    if (localStorage[LOCAL_STORAGE_TOKEN_NAME])
         yield setAuthToken(localStorage[LOCAL_STORAGE_TOKEN_NAME]);
-    }
+
     try {
         const response = yield authApi.loadUser();
         if (response.data.success) {
-            console.log(response.data.user);
             yield put(loadUserSucceed(response.data.user));
+            const houseId = response.data.user.houses[0];
+            yield put(getHouseRequest(houseId, houseType.mine));
+            yield put(getLastLoginRequest());
+            yield put(getAllRequest());
         }
     } catch (error) {
+        console.log(error);
         yield localStorage.removeItem(LOCAL_STORAGE_TOKEN_NAME);
         yield setAuthToken(null);
         yield put(loadUserFail());
+        yield put(openSnackbar({
+            message: "Oops! Please try again",
+            severity: snackbarSeverity.error
+        }))
     }
+
 }
 
 function* loadUserWatcher() {
@@ -88,7 +100,7 @@ function* authSaga() {
         loginWatcher(),
         registerWatcher(),
         logoutWatcher(),
-      
+
     ]);
 }
 

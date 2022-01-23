@@ -1,3 +1,4 @@
+import { panelModes, snackbarSeverity } from "../../utils/constants";
 import { helperActionTypes } from "../actions/helperActions";
 
 const initialState = {
@@ -10,8 +11,19 @@ const initialState = {
     spinner: {
         show: false,
         message: ""
-    }
+    },
 
+    addEditPanel: {
+        show: false,
+        mode: "",
+        currentItem: null
+    },
+
+    search: {
+        keyword: "",
+        results: "",
+        found: ""
+    }
 }
 
 const helperReducer = (state = initialState, action) => {
@@ -56,13 +68,48 @@ const helperReducer = (state = initialState, action) => {
                 }
             }
 
+        case helperActionTypes.ADD_PANEL_OPEN:
+            return {
+                ...state,
+                addEditPanel: {
+                    show: true,
+                    mode: panelModes.add
+                }
+            }
+
+        case helperActionTypes.EDIT_PANEL_OPEN:
+            return {
+                ...state,
+                addEditPanel: {
+                    show: true,
+                    mode: panelModes.edit,
+                    currentItem: payload
+                }
+            }
+
+        case helperActionTypes.ADD_EDIT_PANEL_CLOSE:
+            return {
+                ...state,
+                addEditPanel: {
+                    show: false,
+                    mode: "",
+                    currentItem: null
+                }
+            }
+
+        case helperActionTypes.SEARCH_USER_SUCCEED:
+            return {
+                ...state,
+                search: {
+                    ...state.search,
+                    keyword: payload.keyword,
+                    results: payload.users,
+                    found: payload.found
+                }
+            }
         default:
             return state;
-
     }
-
-
-
 }
 
 export default helperReducer;

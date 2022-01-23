@@ -5,10 +5,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import FullscreenSpinner from './components/Common/FullscreenSpinner';
 import ProtectedRoute from './pages/ProtectedRoute';
 import Landing from './pages/Landing';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { loadUserRequest } from './redux/actions/authActions';
 import { useEffect } from 'react';
-import { getLastLoginRequest } from './redux/actions/notificationActions';
+import CustomSnackbar from './components/Common/CustomSnackbar';
 
 const Container = styled(Box)({});
 
@@ -16,24 +16,24 @@ const Container = styled(Box)({});
 function App() {
 
   const dispatch = useDispatch();
+  const user = useSelector(state => state.auth.user);
 
   useEffect(() => {
     dispatch(loadUserRequest());
-    dispatch(getLastLoginRequest());
   }, [dispatch]);
 
   return (
     <Router>
       <Container>
+        <CustomSnackbar />
         <FullscreenSpinner />
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/register" element={<Auth authRoute="register" />} />
           <Route path="/login" element={<Auth authRoute="login" />} />
-
           <Route path="/dashboard" element={<ProtectedRoute appRoute="dashboard" />} />
-
-
+          <Route path="/search/users" element={<ProtectedRoute appRoute="users" />} />
+          <Route path="/users/:id/house/:houseId" element={<ProtectedRoute appRoute="dashboard" />} />
         </Routes>
 
       </Container>

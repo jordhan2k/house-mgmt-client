@@ -9,6 +9,7 @@ import { LogoutRounded } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { logoutRequest } from '../../redux/actions/authActions';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import { Link } from 'react-router-dom';
 
 
 const Container = styled(Box)(props => ({
@@ -41,7 +42,6 @@ const Sidebar = () => {
 
     const dispatch = useDispatch();
 
-
     const handleLogout = () => {
         console.log()
         if (window.confirm("Do you want to logout?")) {
@@ -49,16 +49,19 @@ const Sidebar = () => {
         }
     }
 
-
     return (
         <Container>
+
             <IconContainer>
                 <MenuRoundedIcon sx={{ fill: "white", fontSize: 40 }} />
             </IconContainer>
 
-            <IconContainer>
-                <Icon src={home} />
-            </IconContainer>
+
+            <Link to="/dashboard" >
+                <IconContainer>
+                    <Icon src={home} />
+                </IconContainer>
+            </Link>
 
             <IconContainer>
                 <Icon src={settings} />
@@ -68,9 +71,11 @@ const Sidebar = () => {
                 <Icon src={calendar} />
             </IconContainer>
 
-            <IconContainer>
-                <PeopleAltOutlinedIcon sx={{ fill: "white", fontSize: 40 }} />
-            </IconContainer>
+            <Link to="/search/users" >
+                <IconContainer>
+                    <PeopleAltOutlinedIcon sx={{ fill: "white", fontSize: 40 }} />
+                </IconContainer>
+            </Link>
 
             <IconContainer style={{
                 position: "absolute",

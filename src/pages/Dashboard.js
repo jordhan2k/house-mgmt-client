@@ -1,57 +1,47 @@
-import { Box, Button, Dialog, Divider, Grid, Paper, styled, Typography } from '@mui/material'
-import React, { useState } from 'react'
-import Calendar from 'react-calendar';
-import SidePanel from '../components/Common/SidePanel';
-import TopBar from '../components/Common/TopBar';
+import { Box, Grid, styled, Tab, Tabs, Typography } from '@mui/material'
+import React, { useEffect, useState } from 'react'
 import '../customCSS/calendar.css';
 import { colors } from '../utils/constants';
-import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
-import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import AddEditItemPanel from '../components/Dashboard/AddEditItemPanel';
+import { useDispatch, useSelector } from 'react-redux';
+import { getGuestRequest } from '../redux/actions/houseItemActions';
+import ItemCard from '../components/Dashboard/ItemCard';
+import { openAddPanel } from '../redux/actions/helperActions';
+import { useLocation, useParams } from 'react-router-dom';
+import { isAuthorized } from '../utils/helpers';
+import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import { addCommentRequest, fetchCommentsRequest } from "../redux/actions/commentActions"
+import CommentCard from '../components/Dashboard/CommentCard';
+import CommentGroup from '../components/Dashboard/CommentGroup';
 
-const Container = styled(Box)(props => ({
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    fontFamily: "inherit"
-}));
 
-const ContentWrapper = styled(Box)(props => ({
+export const ContentWrapper = styled(Box)(props => ({
     display: "flex",
     flex: 1,
     width: "100%",
-}))
+}));
 
-const ContentPanel = styled(Box)(props => ({
+export const ContentPanel = styled(Box)(props => ({
     flex: 8,
     height: "calc(100vh - 60px)",
     paddingBottom: 20,
     boxSizing: "border-box",
-    // overflowY: "scroll"
+    color: colors.secondaryDarkBlue
 }));
 
-const Toolbar = styled(Box)(props => ({
+export const Toolbar = styled(Box)(props => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "10px"
+    padding: "5px 10px",
+    paddingRight: 20
 }))
 
-const Item = styled(Paper)(({ theme }) => ({
-    ...theme.typography.body2,
-    padding: theme.spacing(2),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-    // height: 200
-
-}));
-
-const ActionButton = styled('button')(props => ({
+export const ActionButton = styled('button')(props => ({
     backgroundColor: props.bg,
     color: !props.color ? "white" : props.color,
     border: "none",
     padding: "8px 10px",
-    textTransform: "none",
     borderRadius: 10,
     fontWeight: 600,
     boxShadow: "0 0 4px 1px rgba(0, 0, 0, .2)",
@@ -59,79 +49,166 @@ const ActionButton = styled('button')(props => ({
     textTransform: "uppercase"
 }));
 
-const Input = styled('input')(props => ({
-    border: "none",
-    outline: "none"
+const TabTitle = styled(Tab)(props => ({
+    padding: 0,
+    textTransform: "none",
+    fontFamily: "inherit",
+    color: colors.secondaryDarkBlue,
+    lineHeight: 1,
+    minHeight: 48
 }));
+
+const CommentInput = styled('input')(props => ({
+
+
+}));
+
+const CommentList = styled(Box)(props => ({
+    padding: 10
+}))
+
+const a11yProps = (index) => {
+    return {
+        id: `simple-tab-${index}`,
+        'aria-controls': `simple-tabpanel-${index}`,
+    };
+}
+
+const TabPanel = (props) => {
+    const { children, value, index, ...other } = props;
+
+    return value === index && (<Box style={{
+        height: "calc(100vh - 60px - 68px)",
+        overflowY: "scroll",
+        padding: "10px 5px 20px 5px",
+        boxSizing: "border-box"
+    }} {...other} >
+        {children}
+    </Box>)
+}
 
 const Dashboard = () => {
 
-    const [showDialog, setShowDialog] = useState(false);
+    const [comment, setComment] = useState("");
+    const [tabIndex, setTabIndex] = useState(0);
+    const handleChangeTabIndex = (event, newValue) => setTabIndex(newValue);
+
+    const user = useSelector(state => state.auth.user);
+    const { myHouse, currentGuestHouse } = useSelector(state => state.house);
+    const { targetedHouse, comments } = useSelector(state => state.house.comments);
+    const { show } = useSelector(state => state.helper.addEditPanel);
+
+    const dispatch = useDispatch();
+    const location = useLocation();
+    const params = useParams();
+
+    useEffect(() => {
+        if (params.hasOwnProperty("id")) {
+            console.log(params.id);
+            console.log(params.houseId);
+            dispatch(getGuestRequest(params.id));
+            dispatch(fetchCommentsRequest(params.houseId));
+        } else {
+            dispatch(fetchCommentsRequest(user.houses[0]));
+        }
+    }, [params, dispatch]);
+
+    useEffect(() => { }, []);
+
+    let itemsBody;
+    if (location.pathname.includes("dashboard")) {
+        itemsBody = myHouse && myHouse.items.map(item => !item.isDeleted && (
+            <ItemCard key={item._id} item={item} />))
+    }
+    if (location.pathname.includes("house")) {
+        itemsBody = currentGuestHouse && currentGuestHouse.items.map(item => !item.isDeleted && (
+            <ItemCard key={item._id} item={item} />))
+    }
+
+    const handleSubmitComment = event => {
+        event.preventDefault();
+        if (comment) {
+            const newComment = {
+                postedBy: user._id,
+                content: comment,
+                about: targetedHouse,
+                level: 1
+            }
+            dispatch(addCommentRequest(newComment));
+            setComment("");
+        }
+    }
 
     return (
-        <Container>
-            <TopBar />
-            <ContentWrapper>
-                <ContentPanel>
-                    <Toolbar>
-                        <Box>
-                            <ChevronLeftRoundedIcon />
-                            <ChevronRightRoundedIcon />
-                        </Box>
+        <ContentPanel>
+            <Toolbar>
+                <Box>
+                    <Tabs value={tabIndex} onChange={handleChangeTabIndex}>
+                        <TabTitle label="Items" {...a11yProps(0)} />
+                        <TabTitle label="Comments" {...a11yProps(1)} />
+                    </Tabs>
+                </Box>
+                {(isAuthorized(location, params, user) && tabIndex === 0) && <ActionButton bg={colors.primaryBlue} onClick={() => dispatch(openAddPanel())}>
+                    + Add a new item
+                </ActionButton>}
+            </Toolbar>
 
-                        <ActionButton bg={colors.primaryBlue} onClick={() => setShowDialog(true)}>
-                            + Add a new item
-                        </ActionButton>
-                    </Toolbar>
-                    <Box style={{
-                        height: "calc(100vh - 56px - 60px)",
-                        overflowY: "scroll",
-                        padding: 10,
-                        boxSizing: "border-box"
-                    }}>
-                        <Grid container spacing={4} >
-                            <Grid item xs={3}>
-                                <Item>xs=3</Item>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </ContentPanel>
-                <Divider orientation='vertical' />
-                <SidePanel />
-            </ContentWrapper>
+            <TabPanel value={tabIndex} index={0}>
+                <Grid container spacing={4} >
+                    {itemsBody}
+                </Grid>
+            </TabPanel>
 
-            <Dialog
-                open={showDialog}
-                onClose={() => setShowDialog(false)}
-            >
+            <TabPanel value={tabIndex} index={1}>
+                <Typography style={{ padding: 10 }} fontFamily="inherit" fontWeight={600}>Add a comment</Typography>
                 <Box
-                    style={{
-                        padding: 20,
-                        border: 10
-                    }}
+                    onSubmit={handleSubmitComment}
                     component="form"
-                >
-                    <Input placeholder="Enter item name" />
-                    <Input placeholder="Choose expire date " />
-                    <Input placeholder="Choose location " />
-                    <Input placeholder="Enter item code" />
-                    <Input placeholder="Choose function" />
-                    <Input type="file" accept="image/*" />
-
-                    <Divider style={{ margin: "10px 0" }} />
-
+                    style={{
+                        maxWidth: "880px",
+                        display: "flex",
+                        border: "1px solid rgba(0, 0, 0, .2)",
+                        margin: "0 10px",
+                        borderRadius: 10,
+                        overflow: "hidden",
+                        padding: 10,
+                        alignItems: "center"
+                    }}>
+                    <CommentInput
+                        autoComplete="off"
+                        placeholder="Enter your comment here..."
+                        name="comment"
+                        value={comment}
+                        onChange={event => setComment(event.target.value)}
+                        style={{ border: "none", outline: "none", resize: "none", flex: 1 }}
+                    />
                     <Box
-                        display="flex"
-                        width="100%"
-                        alignItems="center"
-                        justifyContent="space-between">
-                        <ActionButton bg="white" color={colors.secondaryDarkBlue}>Cancel</ActionButton>
-                        <ActionButton bg={colors.primaryBlue}>Save</ActionButton>
+                        component="button"
+                        type="submit"
+                        sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            width: 40,
+                            height: 40,
+                            backgroundColor: colors.primaryBlue,
+                            borderRadius: "100%",
+                            border: "none",
+                            cursor: "pointer"
+                        }}>
+                        <SendRoundedIcon style={{ fill: "white" }} />
                     </Box>
                 </Box>
 
-            </Dialog>
-        </Container >
+                <CommentList>
+                    {comments.map(comment => (
+                        <CommentGroup key={comment._id} parentComment={ comment } />
+                    ))}
+                </CommentList>
+            </TabPanel>
+
+            {show && <AddEditItemPanel />}
+        </ContentPanel>
     )
 }
 

@@ -1,8 +1,10 @@
+import axiosClient from "./axiosClient";
 
 
-class UserApi  {
-
-
+class UserApi {
+    getById(userId) {
+        return axiosClient.get(`users/${userId}`);
+    }
 }
 
 const userApi = new UserApi();
