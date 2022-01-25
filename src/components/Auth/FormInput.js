@@ -5,6 +5,7 @@ import userImg from '../../assets/images/user.png';
 import keyImg from '../../assets/images/key.png';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
+import { ErrorMessage } from '../../pages/Auth';
 
 const FormInputContainer = styled('div')(props => ({
     width: "100%",
@@ -35,21 +36,23 @@ const SmallImg = styled('img')(props => ({
     margin: "0 10px"
 }));
 
-const FormInput = ({ type, status, ...rest }) => {
+const FormInput = ({ fldType, type, status, input, label, meta: { touched, error, warning }, ...rest }) => {
     return (
         <>
             <FormInputContainer>
-                <SmallImg src={type === authInputTypes.username ? userImg : keyImg} />
+                <SmallImg src={fldType === authInputTypes.username ? userImg : keyImg} />
                 <Input
+                    {...input}
                     required
-                    type={type === authInputTypes.password && "password"}
+                    type={type}
                     {...rest} />
 
-                {status === "error" && <CancelOutlinedIcon style={{ fill: colors.primaryRed }} />}
-                {status === "success" && <CheckCircleOutlineRoundedIcon style={{ fill: colors.primaryGreen }} />}
+                {(touched && error) && <CancelOutlinedIcon style={{ fill: colors.primaryRed }} />}
+                {(touched && !error) && <CheckCircleOutlineRoundedIcon style={{ fill: colors.primaryGreen }} />}
             </FormInputContainer>
+            {(touched && error) && <ErrorMessage>{error}</ErrorMessage>}
         </>
     )
 }
 
-export default FormInput
+export default FormInput;

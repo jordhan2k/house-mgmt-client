@@ -1,56 +1,55 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { AuthButton, ErrorMessage, FormBody, FormContainer, FormFooter } from '../../pages/Auth'
+import { Field, formValueSelector, reduxForm } from 'redux-form'
+import { AuthButton, FormBody, FormContainer, FormFooter } from '../../pages/Auth'
 import { loginRequest } from '../../redux/actions/authActions'
 import { authInputTypes } from '../../utils/constants'
 import FormInput from './FormInput'
 
-const LoginForm = () => {
+const loginValidate = values => {
+    const error = {};
+    if (!values.username) {
+        error.username = "Required";
+    } else if (values.username.length < 6) {
+        error.username = "Must be from 6 chars long"
+    }
+    if (!values.password) {
+        error.password = "Required";
+    } else if (values.password.length < 8 || values.password.length > 15) {
+        error.password = "Must be from 8 to 15 chars long"
+    }
+    return error;
+}
 
+let LoginForm = ({ username, password }) => {
     const dispatch = useDispatch();
-
-    const initialForm = {
-        username: "",
-        password: ""
-    }
-
-    const [loginForm, setLoginForm] = useState(initialForm);
-
-    const { username, password } = loginForm;
-
-    const handleInputChange = event => {
-        setLoginForm(prevState => ({
-            ...prevState,
-            [event.target.name]: event.target.value
-        }))
-    }
 
     const handleSubmit = event => {
         event.preventDefault();
-        dispatch(loginRequest(loginForm));
+        if (username && password) {
+            dispatch(loginRequest({ username, password }));
+        }
     }
 
     return (
-        <FormContainer component={"form"} onSubmit={event => handleSubmit(event)}>
+        <FormContainer component={"form"} onSubmit={handleSubmit}>
             <FormBody >
-                <FormInput
+                <Field
                     name="username"
-                    value={username}
-                    type={authInputTypes.username}
                     placeholder="Enter your username"
-                    onChange={event => handleInputChange(event)}
+                    component={FormInput}
+                    fldType={authInputTypes.username}
+                    type="text"
                 />
-                {(username && username.length < 6) && <ErrorMessage >Must be from 6 chars long.</ErrorMessage>}
 
-                <FormInput
+                <Field
                     name="password"
-                    value={password}
-                    type={authInputTypes.password}
+                    fldType={authInputTypes.password}
                     placeholder="Enter password"
-                    onChange={event => handleInputChange(event)}
+                    type="password"
+                    component={FormInput}
                 />
-
             </FormBody>
 
             <FormFooter>
@@ -69,4 +68,16 @@ const LoginForm = () => {
     )
 }
 
-export default LoginForm
+LoginForm = reduxForm({
+    form: "form/auth/login",
+    validate: loginValidate
+})(LoginForm);
+
+const selector = formValueSelector("form/auth/login");
+
+LoginForm = connect(state => ({
+    username: selector(state, "username"),
+    password: selector(state, "password")
+}))(LoginForm);
+
+export default LoginForm;

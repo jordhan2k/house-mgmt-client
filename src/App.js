@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loadUserRequest } from './redux/actions/authActions';
 import { useEffect } from 'react';
 import CustomSnackbar from './components/Common/CustomSnackbar';
+import ReduxForm from './pages/ReduxForm';
 
 const Container = styled(Box)({});
 
@@ -34,6 +35,7 @@ function App() {
           <Route path="/dashboard" element={<ProtectedRoute appRoute="dashboard" />} />
           <Route path="/search/users" element={<ProtectedRoute appRoute="users" />} />
           <Route path="/users/:id/house/:houseId" element={<ProtectedRoute appRoute="dashboard" />} />
+          <Route path="/redux-form" element={<ReduxForm />} />
         </Routes>
 
       </Container>

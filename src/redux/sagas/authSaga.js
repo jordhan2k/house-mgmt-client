@@ -48,7 +48,7 @@ function* loginHandler(action) {
             yield put(loadUserRequest());
         } else {
             alert(response.data.message);
-            console.log(response.data.message)
+            console.log(response.data)
         }
     } catch (error) {
         console.log(error);
