@@ -47,8 +47,10 @@ function* loginHandler(action) {
             yield localStorage.setItem(LOCAL_STORAGE_TOKEN_NAME, accessToken);
             yield put(loadUserRequest());
         } else {
-            alert(response.data.message);
-            console.log(response.data)
+            yield put(openSnackbar({
+                message: response.data.message,
+                severity: snackbarSeverity.error
+            }));
         }
     } catch (error) {
         console.log(error);
@@ -70,11 +72,12 @@ function* registerHandler(action) {
             yield localStorage.setItem(LOCAL_STORAGE_TOKEN_NAME, accessToken);
             yield put(loadUserRequest());
         } else {
-            alert(response.data.message);
-            console.log(response.data);
+            yield put(openSnackbar({
+                message: response.data.message,
+                severity: snackbarSeverity.error
+            }));
         }
     } catch (error) {
-
         console.log(error);
     }
 }

@@ -4,18 +4,25 @@ import { Link } from 'react-router-dom'
 import { Field, formValueSelector, reduxForm } from 'redux-form'
 import { AuthButton, FormBody, FormContainer, FormFooter } from '../../pages/Auth'
 import { loginRequest } from '../../redux/actions/authActions'
-import { authInputTypes } from '../../utils/constants'
+import { authInputTypes, colors } from '../../utils/constants'
 import { loginValidate } from '../../utils/formValidators'
-import FormInput from './FormInput'
+import FormInput from './FormInput';
+import { Box, styled, Typography } from '@mui/material';
 
+const Label = styled("label")({
+    fontSize: 14,
+    fontWeight: 500,
+    marginLeft: 10,
+    color: colors.secondaryDarkBlue
+})
 
-let LoginForm = ({ username, password }) => {
+let LoginForm = ({ username, password, staySignedIn }) => {
     const dispatch = useDispatch();
 
     const handleSubmit = event => {
         event.preventDefault();
         if (username && password) {
-            dispatch(loginRequest({ username, password }));
+            dispatch(loginRequest({ username, password, staySignedIn }));
         }
     }
 
@@ -37,6 +44,16 @@ let LoginForm = ({ username, password }) => {
                     type="password"
                     component={FormInput}
                 />
+
+                <Box display="flex" alignItems="center">
+                    <Field
+                        name="staySignedIn"
+                        type="checkbox"
+                        component="input"
+                        id="stay-signed-in"
+                    />
+                    <Label htmlFor="stay-signed-in">Stay signed in</Label>
+                </Box>
             </FormBody>
 
             <FormFooter>
@@ -64,7 +81,8 @@ const selector = formValueSelector("form/auth/login");
 
 LoginForm = connect(state => ({
     username: selector(state, "username"),
-    password: selector(state, "password")
+    password: selector(state, "password"),
+    staySignedIn: selector(state, "staySignedIn")
 }))(LoginForm);
 
 export default LoginForm;
