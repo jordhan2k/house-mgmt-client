@@ -5,22 +5,9 @@ import { Field, formValueSelector, reduxForm } from 'redux-form'
 import { AuthButton, FormBody, FormContainer, FormFooter } from '../../pages/Auth'
 import { loginRequest } from '../../redux/actions/authActions'
 import { authInputTypes } from '../../utils/constants'
+import { loginValidate } from '../../utils/formValidators'
 import FormInput from './FormInput'
 
-const loginValidate = values => {
-    const error = {};
-    if (!values.username) {
-        error.username = "Required";
-    } else if (values.username.length < 6) {
-        error.username = "Must be from 6 chars long"
-    }
-    if (!values.password) {
-        error.password = "Required";
-    } else if (values.password.length < 8 || values.password.length > 15) {
-        error.password = "Must be from 8 to 15 chars long"
-    }
-    return error;
-}
 
 let LoginForm = ({ username, password }) => {
     const dispatch = useDispatch();

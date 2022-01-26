@@ -1,13 +1,13 @@
 import { Box, styled, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AuthButton, ErrorMessage, FormBody, FormContainer, FormFooter } from '../../pages/Auth';
+import { AuthButton, FormBody, FormContainer, FormFooter } from '../../pages/Auth';
 import { authInputTypes, colors } from '../../utils/constants';
 import FormInput from './FormInput';
-import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
-import { connect, useDispatch, useSelector } from 'react-redux';
-import { checkUsernameSucceed, chekUsernameRequest, registerRequest } from '../../redux/actions/authActions';
+import { connect, useDispatch } from 'react-redux';
+import { registerRequest } from '../../redux/actions/authActions';
 import { Field, formValueSelector, reduxForm } from 'redux-form';
+import { gradePassword, registerValidate } from '../../utils/formValidators';
 
 const PasswordStrength = styled(Box)(props => ({
     margin: "10px 0",
@@ -26,31 +26,6 @@ const Level = styled(Box)(props => ({
     boxShadow: "0 0 3px 1px rgba(0, 0, 0, .1)"
 }));
 
-const passwordPattern = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])");
-
-const registerValidate = values => {
-    const error = {}
-    if (!values.username) {
-        error.username = "Required";
-    } else if (values.username.length < 6) {
-        error.username = "Must be from 6 chars long"
-    }
-    if (!values.password) {
-        error.password = "Required";
-    } else if (values.password.length < 8 || values.password.length > 15) {
-        error.password = "Must be from 8 to 15 chars long"
-    } else if (!passwordPattern.test(values.password)) {
-        error.password = "Must contain at leat 1 uppercase, 1 lowercase, 1 digit and 1 special character"
-    }
-
-    if (!values.confirmPassword) {
-        error.confirmPassword = "Required";
-    } else if (values.password !== values.confirmPassword) {
-        error.confirmPassword = "Passwords do not match"
-    }
-
-    return error;
-}
 
 let RegisterForm = ({ username, password, confirmPassword }) => {
 
@@ -59,19 +34,8 @@ let RegisterForm = ({ username, password, confirmPassword }) => {
     const [passwordScore, setPasswordScore] = useState(0);
 
     useEffect(() => {
-        setPasswordScore(gradePassword());
+        setPasswordScore(gradePassword(password, confirmPassword));
     }, [password, confirmPassword]);
-
-
-    const gradePassword = () => {
-        let score = 0;
-        if (password && confirmPassword) {
-            if (password.length >= 8 && password.length <= 15) score++;
-            if (passwordPattern.test(password)) score++;
-            if (password === confirmPassword) score++
-        }
-        return score;
-    }
 
     const handleSubmit = event => {
         event.preventDefault();

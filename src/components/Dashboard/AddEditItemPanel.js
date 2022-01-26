@@ -6,10 +6,12 @@ import defaultImg from '../../assets/images/default.jpg';
 import PanelInput from './PanelInput';
 import { WelcomeText } from '../Common/TopBar';
 import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
-import { useDispatch, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { createItemRequest, updateItemRequest } from '../../redux/actions/houseItemActions';
 import { closeAddEditPanel } from '../../redux/actions/helperActions';
 import moment from 'moment';
+import { Field, formValueSelector, reduxForm } from 'redux-form';
+import { itemValidate } from '../../utils/formValidators';
 
 const ImageContainer = styled(Box)(props => ({
     width: 230,
@@ -37,45 +39,14 @@ const IconContainer = styled(Box)(props => ({
 
 }));
 
-const AddEditItemPanel = () => {
-    const { show, mode, currentItem } = useSelector(state => state.helper.addEditPanel);
+let AddEditItemPanel = (props) => {
+    const { mode, currentItem } = useSelector(state => state.helper.addEditPanel);
     const { imagePrefix } = useSelector(state => state.house);
     const dispatch = useDispatch();
-
-    const initialItem = {
-        name: "",
-        expireDate: "",
-        purchaseDate: "",
-        location: "",
-        itemFunction: "",
-        price: "",
-        itemCode: "",
-    };
-
-
+    const { name, expireDate, purchaseDate, location, itemFunction, price, itemCode } = props.item;
     const currentHouseId = useSelector(state => state.auth.user.houses[0]);
-    const [item, setItem] = useState(initialItem);
     const [image, setImage] = useState(currentItem ? `${imagePrefix}${currentItem.image}` : "");
     const [file, setFile] = useState();
-    const { name, expireDate, purchaseDate, location, itemFunction, price, itemCode } = item;
-
-
-    useEffect(() => {
-        if (mode === panelModes.edit) {
-            setItem({
-                ...currentItem,
-                expireDate: moment(currentItem.expireDate).format("yyyy-MM-DD"),
-                purchaseDate: moment(currentItem.purchaseDate).format("yyyy-MM-DD")
-            })
-        }
-    }, [mode, currentItem])
-
-    const handleNonFileInputChange = event => {
-        setItem(prevStates => ({
-            ...prevStates,
-            [event.target.name]: event.target.value
-        }));
-    };
 
     const handleFileChange = event => {
         setFile(event.target.files[0]);
@@ -83,7 +54,6 @@ const AddEditItemPanel = () => {
         fileReader.readAsDataURL(event.target.files[0]);
         fileReader.onload = e => {
             setImage(e.target.result);
-            console.log(e.target.result)
         }
     }
 
@@ -91,13 +61,8 @@ const AddEditItemPanel = () => {
         event.preventDefault();
         const form = new FormData();
 
-        if (mode === panelModes.add && !file) {
-            alert("Please add an image!");
-        }
-
-        if (file) {
-            form.append("file", file);
-        }
+        if (mode === panelModes.add && !file) alert("Please add an image!");
+        if (file) form.append("file", file);
 
         form.append("name", name);
         form.append("expireDate", expireDate);
@@ -112,7 +77,6 @@ const AddEditItemPanel = () => {
             dispatch(createItemRequest(form));
         }
         if (mode === panelModes.edit) {
-            console.log(currentItem._id);
             form.append("_id", currentItem._id)
             dispatch(updateItemRequest(currentItem._id, form));
         }
@@ -120,7 +84,6 @@ const AddEditItemPanel = () => {
     }
 
     const handleClose = () => {
-        setItem(initialItem);
         dispatch(closeAddEditPanel());
     }
 
@@ -147,13 +110,13 @@ const AddEditItemPanel = () => {
                         flexWrap="wrap"
                         justifyContent="space-between"
                         paddingRight={2} >
-                        <PanelInput required label="Name *" name="name" value={name} onChange={handleNonFileInputChange} />
-                        <PanelInput required label="Expire date *" name="expireDate" type="date" value={expireDate} onChange={handleNonFileInputChange} />
-                        <PanelInput label="Purchase date" name="purchaseDate" type="date" value={purchaseDate} onChange={handleNonFileInputChange} />
-                        <PanelInput required label="Location *" name="location" value={location} onChange={handleNonFileInputChange} />
-                        <PanelInput label="item code" name="itemCode" value={itemCode} onChange={handleNonFileInputChange} />
-                        <PanelInput required label="function *" name="itemFunction" value={itemFunction} onChange={handleNonFileInputChange} />
-                        <PanelInput label="price (VND)" name="price" type="number" min={0} value={price} onChange={handleNonFileInputChange} />
+                        <Field required label="Name *" name="name" value={name} component={PanelInput} />
+                        <Field required label="Expire date *" name="expireDate" type="date" value={expireDate} component={PanelInput} />
+                        <Field label="Purchase date" name="purchaseDate" type="date" value={purchaseDate} component={PanelInput} />
+                        <Field required label="Location *" name="location" value={location} component={PanelInput} />
+                        <Field label="item code" name="itemCode" value={itemCode} component={PanelInput} />
+                        <Field required label="function *" name="itemFunction" value={itemFunction} component={PanelInput} />
+                        <Field label="price (VND)" name="price" type="number" min={0} value={price} component={PanelInput} />
                     </Box>
                     <Box display="flex" flexDirection="column">
                         <ImageContainer>
@@ -185,4 +148,23 @@ const AddEditItemPanel = () => {
     )
 }
 
-export default AddEditItemPanel
+AddEditItemPanel = reduxForm({
+    form: "form/items/addEdit",
+    validate: itemValidate
+})(AddEditItemPanel);
+
+const itemSelector = formValueSelector("form/items/addEdit");
+AddEditItemPanel = connect(state => {
+    const item = itemSelector(state, "name", "expireDate", "purchaseDate", "location", "itemFunction", "price", "itemCode");
+    const currentItem = state.helper.addEditPanel.currentItem;
+    return {
+        initialValues: currentItem && {
+            ...currentItem,
+            expireDate: moment(currentItem.expireDate).format("yyyy-MM-DD"),
+            purchaseDate: moment(currentItem.purchaseDate).format("yyyy-MM-DD")
+        },
+        item
+    };
+})(AddEditItemPanel);
+
+export default AddEditItemPanel;

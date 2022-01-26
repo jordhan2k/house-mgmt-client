@@ -23,11 +23,11 @@ const Input = styled('input')(props => ({
 }));
 
 
-const PanelInput = ({ label ,...rest }) => {
+const PanelInput = ({ label, input, meta: { touched, error, warning }, ...rest }) => {
     return (
         <Container >
             <Label>{label}</Label>
-            <Input {...rest} />
+            <Input {...input}  {...rest} />
         </Container>
 
     )

@@ -25,9 +25,6 @@ const Input = styled('input')(props => ({
     padding: 5,
     outline: "none",
     flex: 1,
-    ":: placeholder": {
-
-    }
 }));
 
 const SmallImg = styled('img')(props => ({
@@ -41,11 +38,7 @@ const FormInput = ({ fldType, type, status, input, label, meta: { touched, error
         <>
             <FormInputContainer>
                 <SmallImg src={fldType === authInputTypes.username ? userImg : keyImg} />
-                <Input
-                    {...input}
-                    required
-                    type={type}
-                    {...rest} />
+                <Input   {...input} required type={type}  {...rest} />
 
                 {(touched && error) && <CancelOutlinedIcon style={{ fill: colors.primaryRed }} />}
                 {(touched && !error) && <CheckCircleOutlineRoundedIcon style={{ fill: colors.primaryGreen }} />}
