@@ -8,6 +8,7 @@ import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import { colors } from '../utils/constants';
+import Scrollbars from 'react-custom-scrollbars';
 
 const UserCard = styled(Box)(props => ({
   display: "flex",
@@ -54,39 +55,42 @@ const Users = () => {
   const { found, results, keyword } = useSelector(state => state.helper.search);
 
   return (
-    <ContentPanel style={{ padding: 15, overflowY: "scroll" }}>
+    <ContentPanel>
+      <Scrollbars style={{ height: "calc(100vh - 60px)" }} >
+        <Box style={{ padding: 15 }}>
+          {found !== "" && (
+            found > 0 ?
+              (<>
+                <FoundText>Found {results.length > 0 ? results.length : "0"} results for keyword "{keyword}"</FoundText>
+                {results.map(user => (
+                  <Link to={`/users/${user._id}/house/${user.houses[0]}`} style={{ textDecoration: "none", color: colors.secondaryDarkBlue }}>
+                    <UserCard sx={{
+                      "&:hover > div": {
+                        opacity: 1
+                      }
+                    }}>
+                      <Box display="flex">
+                        <AvatarContainer>
+                          <Image src={avatar} />
+                        </AvatarContainer>
+                        <Box display="flex" flexDirection="column">
+                          <Username>{user.username}</Username>
+                          <Typography variant="body2" fontFamily="inherit" fontSize={12} fontStyle="italic" justifyContent="space-between">
+                            Joined {moment(user.createdAt).fromNow()}
+                          </Typography>
+                        </Box>
 
-      {found !== "" && (
-        found > 0 ?
-          (<>
-            <FoundText>Found {results.length > 0 ? results.length : "0"} results for keyword "{keyword}"</FoundText>
-            {results.map(user => (
-              <Link to={`/users/${user._id}/house/${user.houses[0]}`} style={{ textDecoration: "none", color: colors.secondaryDarkBlue }}>
-                <UserCard sx={{
-                  "&:hover > div": {
-                    opacity: 1
-                  }
-                }}>
-                  <Box display="flex">
-                    <AvatarContainer>
-                      <Image src={avatar} />
-                    </AvatarContainer>
-                    <Box display="flex" flexDirection="column">
-                      <Username>{user.username}</Username>
-                      <Typography variant="body2" fontFamily="inherit" fontSize={12} fontStyle="italic" justifyContent="space-between">
-                        Joined {moment(user.createdAt).fromNow()}
-                      </Typography>
-                    </Box>
+                      </Box>
+                      <ChevronRightRoundedIcon sx={{ fill: "rgba(0, 0, 0, .2)" }} />
+                    </UserCard>
+                  </Link>
 
-                  </Box>
-                  <ChevronRightRoundedIcon sx={{ fill: "rgba(0, 0, 0, .2)" }} />
-                </UserCard>
-              </Link>
-
-            ))}
-          </>) :
-          <FoundText>Found no results for keyword "{keyword}"</FoundText>
-      )}
+                ))}
+              </>) :
+              <FoundText>Found no results for keyword "{keyword}"</FoundText>
+          )}
+        </Box>
+      </Scrollbars>
     </ContentPanel>)
 };
 

@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import moment from 'moment';
 import ChatBubbleRoundedIcon from '@mui/icons-material/ChatBubbleRounded';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
+import Scrollbars from 'react-custom-scrollbars';
 
 const NotificationBadge = styled(Badge)(props => ({
     margin: "0 5px",
@@ -43,10 +44,7 @@ const Heading = styled(Typography)(props => ({
 
 const NotificationList = styled(Box)(props => ({
     flex: 1,
-    height: 456,
-    overflowY: "scroll",
-    padding: 10
-
+    padding: "10px 15px 10px 10px"
 }));
 
 const NotificationCard = styled(Box)(props => ({
@@ -96,40 +94,42 @@ const NotificationPanel = ({ show }) => {
                     Notifications
                 </Heading>
                 <Divider />
-                <NotificationList>
-                    {notifications.length > 0 ?
-                        notifications.map(item => (
-                            <NotificationCard>
-                                <Box display="flex"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                    sx={{
-                                        width: 40,
-                                        height: 40,
-                                        borderRadius: 20,
-                                        backgroundColor: (item.content.includes("commented") || item.content.includes("replied"))
-                                            ? colors.primaryBlue
-                                            : colors.primaryOrange,
-                                        "& > svg": {
-                                            fill: "white",
-                                            fontSize: 20
-                                        },
-                                        marginRight: 1
-                                    }}>
-                                    {(item.content.includes("commented") || item.content.includes("replied")) && <ChatBubbleRoundedIcon />}
-                                    {item.content.includes("liked") && <FavoriteRoundedIcon />}
-                                </Box>
-                                <Box style={{ flex: 1 }}>
-                                    <Content>
-                                        {item.content}
-                                    </Content>
-                                    <Time>{moment(item.createdAt).fromNow()}</Time>
-                                </Box>
-                            </NotificationCard>
-                        ))
+                <Scrollbars style={{ height: 456 }}>
+                    <NotificationList>
+                        {notifications.length > 0 ?
+                            notifications.map(item => (
+                                <NotificationCard>
+                                    <Box display="flex"
+                                        alignItems="center"
+                                        justifyContent="center"
+                                        sx={{
+                                            width: 40,
+                                            height: 40,
+                                            borderRadius: 20,
+                                            backgroundColor: (item.content.includes("commented") || item.content.includes("replied"))
+                                                ? colors.primaryBlue
+                                                : colors.primaryOrange,
+                                            "& > svg": {
+                                                fill: "white",
+                                                fontSize: 20
+                                            },
+                                            marginRight: 1
+                                        }}>
+                                        {(item.content.includes("commented") || item.content.includes("replied")) && <ChatBubbleRoundedIcon />}
+                                        {item.content.includes("liked") && <FavoriteRoundedIcon />}
+                                    </Box>
+                                    <Box style={{ flex: 1 }}>
+                                        <Content>
+                                            {item.content}
+                                        </Content>
+                                        <Time>{moment(item.createdAt).fromNow()}</Time>
+                                    </Box>
+                                </NotificationCard>
+                            ))
 
-                        : "There is no notification"}
-                </NotificationList>
+                            : "There is no notification"}
+                    </NotificationList>
+                </Scrollbars>
             </Container>}
 
         </NotificationBadge>

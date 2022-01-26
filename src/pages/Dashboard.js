@@ -13,6 +13,7 @@ import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import { addCommentRequest, fetchCommentsRequest } from "../redux/actions/commentActions"
 import CommentCard from '../components/Dashboard/CommentCard';
 import CommentGroup from '../components/Dashboard/CommentGroup';
+import Scrollbars from 'react-custom-scrollbars';
 
 
 export const ContentWrapper = styled(Box)(props => ({
@@ -77,14 +78,14 @@ const a11yProps = (index) => {
 const TabPanel = (props) => {
     const { children, value, index, ...other } = props;
 
-    return value === index && (<Box style={{
-        height: "calc(100vh - 60px - 68px)",
-        overflowY: "scroll",
-        padding: "10px 5px 20px 5px",
-        boxSizing: "border-box"
-    }} {...other} >
+    return value === index && (<Scrollbars
+        style={{
+            height: "calc(100vh - 60px - 68px)",
+            padding: 10,
+            boxSizing: "border-box"
+        }} {...other} >
         {children}
-    </Box>)
+    </Scrollbars>)
 }
 
 const Dashboard = () => {
@@ -154,7 +155,7 @@ const Dashboard = () => {
             </Toolbar>
 
             <TabPanel value={tabIndex} index={0}>
-                <Grid container spacing={4} >
+                <Grid style={{ padding: "10px 0" }} container spacing={4} >
                     {itemsBody}
                 </Grid>
             </TabPanel>
@@ -202,7 +203,7 @@ const Dashboard = () => {
 
                 <CommentList>
                     {comments.map(comment => (
-                        <CommentGroup key={comment._id} parentComment={ comment } />
+                        <CommentGroup key={comment._id} parentComment={comment} />
                     ))}
                 </CommentList>
             </TabPanel>
