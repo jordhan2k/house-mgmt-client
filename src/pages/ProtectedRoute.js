@@ -43,15 +43,12 @@ const ProtectedRoute = ({ appRoute }) => {
     return (isAuthenticated && user) ? (
         <Container>
             <Sidebar />
-
             <MainPanel className="main-panel">
                 <TopBar />
                 <ContentWrapper>
                     {body}
-
                     {match800 && <SidePanel />}
                 </ContentWrapper>
-
             </MainPanel>
         </Container>
     ) : (<Navigate replace to="/login" />)

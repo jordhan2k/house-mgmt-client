@@ -71,6 +71,7 @@ function* registerHandler(action) {
             const accessToken = response.data.accessToken;
             yield localStorage.setItem(LOCAL_STORAGE_TOKEN_NAME, accessToken);
             yield put(loadUserRequest());
+            // yield window.location = "/login";
         } else {
             yield put(openSnackbar({
                 message: response.data.message,
@@ -95,7 +96,6 @@ function* logoutHandler() {
 function* logoutWatcher() {
     yield takeLatest(authActionTypes.LOGOUT_REQUEST, logoutHandler);
 }
-
 
 function* authSaga() {
     yield all([

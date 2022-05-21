@@ -53,7 +53,8 @@ const EditInput = styled("input")(props => ({
     border: ".2px solid gray",
     outline: "none",
     padding: 5,
-    borderRadius: 20
+    borderRadius: 20,
+    minWidth: 300
 }))
 
 const CommentCard = ({ comment }) => {
@@ -92,15 +93,16 @@ const CommentCard = ({ comment }) => {
     }
 
     const handleEditComment = () => {
-        if (editInput) {
+        if (editInput && editInput !== comment.content) {
             dispatch(editCommentRequest({
                 ...comment,
                 content: editInput,
                 isEdited: true
             }));
-            dispatch(changeActiveComment(null, ""));
-            setEditInput("")
+            setEditInput("");
         }
+        dispatch(changeActiveComment(null, ""));
+
     }
 
     const handleDeleteComment = () => {

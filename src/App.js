@@ -17,7 +17,6 @@ const Container = styled(Box)({});
 function App() {
 
   const dispatch = useDispatch();
-  const user = useSelector(state => state.auth.user);
 
   useEffect(() => {
     dispatch(loadUserRequest());

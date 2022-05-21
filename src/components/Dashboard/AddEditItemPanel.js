@@ -42,11 +42,13 @@ const IconContainer = styled(Box)(props => ({
 let AddEditItemPanel = (props) => {
     const { mode, currentItem } = useSelector(state => state.helper.addEditPanel);
     const { imagePrefix } = useSelector(state => state.house);
-    const dispatch = useDispatch();
-    const { name, expireDate, purchaseDate, location, itemFunction, price, itemCode } = props.item;
     const currentHouseId = useSelector(state => state.auth.user.houses[0]);
+
     const [image, setImage] = useState(currentItem ? `${imagePrefix}${currentItem.image}` : "");
     const [file, setFile] = useState();
+
+    const { name, expireDate, purchaseDate, location, itemFunction, price, itemCode } = props.item;
+    const dispatch = useDispatch();
 
     const handleFileChange = event => {
         setFile(event.target.files[0]);
